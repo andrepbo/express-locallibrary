@@ -1,4 +1,4 @@
-const BookInstance = require("../models/bookinstance");
+const BookInstance = require("../models/bookInstance");
 const asyncHandler = require("express-async-handler");
 
 // Display list of all BookInstances.
