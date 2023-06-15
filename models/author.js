@@ -24,13 +24,21 @@ AuthorSchema.virtual("name").get(function () {
 
 // Virtual for author's lifespan
 AuthorSchema.virtual("lifespan").get(function () {
-  const dateOfBirth = DateTime.fromJSDate(this.date_of_birth).toLocaleString(
-    DateTime.DATE_MED
-  );
-  const dateOfDeath = DateTime.fromJSDate(this.date_of_death).toLocaleString(
-    DateTime.DATE_MED
-  );
-  return `${dateOfBirth} - ${dateOfDeath}`;
+  let lifetime_string = "Not provided";
+  if (this.date_of_birth) {
+    lifetime_string = DateTime.fromJSDate(this.date_of_birth).toLocaleString(
+      DateTime.DATE_MED
+    );
+  }
+  lifetime_string += " - ";
+  if (this.date_of_death) {
+    lifetime_string += DateTime.fromJSDate(this.date_of_death).toLocaleString(
+      DateTime.DATE_MED
+    );
+  } else {
+    lifetime_string += "Not provided";
+  }
+  return lifetime_string;
 });
 
 // Virtual for author's URL
