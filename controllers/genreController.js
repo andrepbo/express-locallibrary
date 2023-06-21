@@ -1,3 +1,4 @@
+const { body, validationResult } = require("express-validator");
 const Book = require("../models/book");
 const Genre = require("../models/genre");
 const asyncHandler = require("express-async-handler");
@@ -33,14 +34,49 @@ exports.genreDetail = asyncHandler(async (req, res, next) => {
 });
 
 // Display Genre create form on GET.
-exports.genreCreateGet = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: Genre create GET");
-});
+exports.genreCreateGet = (req, res, next) => {
+  res.render("genreForm", { title: "Create Genre" });
+};
 
 // Handle Genre create on POST.
-exports.genreCreatePost = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: Genre create POST");
-});
+exports.genreCreatePost = [
+  // Validate and sanitize the name field.
+  body("name", "Genre name must contain at least 3 characters")
+    .trim()
+    .isLength({ min: 3 })
+    .escape(),
+
+  // Process request after validation and sanitization.
+  asyncHandler(async (req, res, next) => {
+    // Extract the validation errors from a request.
+    const errors = validationResult(req);
+
+    // Create a genre object with escaped and trimmed data.
+    const genre = new Genre({ name: req.body.name });
+
+    if (!errors.isEmpty()) {
+      // There are errors. Render the form again with sanitized values/error messages.
+      res.render("genreForm", {
+        title: "Create Genre",
+        genre: genre,
+        errors: errors.array(),
+      });
+      return;
+    } else {
+      // Data from form is valid.
+      // Check if Genre with same name already exists.
+      const genreExists = await Genre.findOne({ name: req.body.name }).exec();
+      if (genreExists) {
+        // Genre exists, redirect to its detail page.
+        res.redirect(genreExists.url);
+      } else {
+        await genre.save();
+        // New genre saved. Redirect to genre detail page.
+        res.redirect(genre.url);
+      }
+    }
+  }),
+];
 
 // Display Genre delete form on GET.
 exports.genreDeleteGet = asyncHandler(async (req, res, next) => {
