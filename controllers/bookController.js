@@ -60,7 +60,7 @@ exports.bookDetail = asyncHandler(async (req, res, next) => {
   res.render("bookDetail", {
     title: book.title,
     book: book,
-    bookInstances: bookInstances,
+    bookinstances: bookInstances,
   });
 });
 
@@ -165,7 +165,7 @@ exports.bookDeleteGet = asyncHandler(async (req, res, next) => {
   res.render("bookDelete", {
     title: "Delete Book",
     book: book,
-    book_instances: bookInstances,
+    bookinstances: bookInstances,
   });
 });
 
@@ -184,11 +184,11 @@ exports.bookDeletePost = asyncHandler(async (req, res, next) => {
   }
 
   if (bookInstances.length > 0) {
-    // Book has book_instances. Render in same way as for GET route.
+    // Book has bookinstances. Render in same way as for GET route.
     res.render("bookDelete", {
       title: "Delete Book",
       book: book,
-      book_instances: bookInstances,
+      bookinstances: bookInstances,
     });
     return;
   } else {

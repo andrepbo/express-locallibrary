@@ -15,11 +15,11 @@ exports.bookInstanceList = asyncHandler(async (req, res, next) => {
 
 // Display detail page for a specific BookInstance.
 exports.bookInstanceDetail = asyncHandler(async (req, res, next) => {
-  const bookInstance = await BookInstance.findById(req.params.id)
+  const bookinstance = await BookInstance.findById(req.params.id)
     .populate("book")
     .exec();
 
-  if (bookInstance === null) {
+  if (bookinstance === null) {
     // No results.
     const err = new Error("Book copy not found");
     err.status = 404;
@@ -28,7 +28,7 @@ exports.bookInstanceDetail = asyncHandler(async (req, res, next) => {
 
   res.render("bookInstanceDetail", {
     title: "Book:",
-    bookInstance: bookInstance,
+    bookinstance: bookinstance,
   });
 });
 
@@ -62,7 +62,7 @@ exports.bookInstanceCreatePost = [
     const errors = validationResult(req);
 
     // Create a BookInstance object with escaped and trimmed data.
-    const bookInstance = new BookInstance({
+    const bookinstance = new BookInstance({
       book: req.body.book,
       imprint: req.body.imprint,
       status: req.body.status,
@@ -77,27 +77,41 @@ exports.bookInstanceCreatePost = [
       res.render("bookInstanceForm", {
         title: "Create BookInstance",
         book_list: allBooks,
-        selected_book: bookInstance.book._id,
+        selected_book: bookinstance.book._id,
         errors: errors.array(),
-        bookinstance: bookInstance,
+        bookinstance: bookinstance,
       });
       return;
     } else {
       // Data from form is valid
-      await bookInstance.save();
-      res.redirect(bookInstance.url);
+      await bookinstance.save();
+      res.redirect(bookinstance.url);
     }
   }),
 ];
 
 // Display BookInstance delete form on GET.
 exports.bookInstanceDeleteGet = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: BookInstance delete GET");
+  const bookinstance = await BookInstance.findById(req.params.id)
+    .populate("book")
+    .exec();
+
+  if (bookinstance === null) {
+    // No results.
+    res.redirect("/catalog/bookinstances");
+  }
+
+  res.render("bookInstanceDelete", {
+    title: "Delete BookInstance",
+    bookinstance: bookinstance,
+  });
 });
 
 // Handle BookInstance delete on POST.
 exports.bookInstanceDeletePost = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: BookInstance delete POST");
+  // Assume valid BookInstance id in field.
+  await BookInstance.findByIdAndRemove(req.body.id);
+  res.redirect("/catalog/bookinstances");
 });
 
 // Display BookInstance update form on GET.
